@@ -67,6 +67,14 @@ interface PullRequestInput extends RepositoryParams {
   reviewers?: string[];
 }
 
+interface CreateRepositoryInput {
+  project?: string;
+  name: string;
+  description?: string;
+  forkable?: boolean;
+  defaultBranch?: string;
+}
+
 interface ListOptions {
   limit?: number;
   start?: number;
@@ -126,7 +134,7 @@ function buildAuthError(config: BitbucketConfig): AuthErrorResponse | null {
               required,
             },
             null,
-            2
+            2,
           ),
         },
       ],
@@ -135,7 +143,10 @@ function buildAuthError(config: BitbucketConfig): AuthErrorResponse | null {
   return null;
 }
 
-function resolveProject(project: string | undefined, defaultProject: string | undefined): string | undefined {
+function resolveProject(
+  project: string | undefined,
+  defaultProject: string | undefined,
+): string | undefined {
   return project || defaultProject || undefined;
 }
 
@@ -160,7 +171,9 @@ function truncateFileSection(fileLines: string[], fileName: string, maxLines: nu
   result.push(...contentLines.slice(0, showAtStart));
   result.push('');
   result.push(`[*** FILE TRUNCATED: ${truncatedCount} lines hidden from ${fileName} ***]`);
-  result.push(`[*** File had ${contentLines.length} total lines, showing first ${showAtStart} and last ${showAtEnd} ***]`);
+  result.push(
+    `[*** File had ${contentLines.length} total lines, showing first ${showAtStart} and last ${showAtEnd} ***]`,
+  );
   result.push('[*** Use maxLinesPerFile=0 to see complete diff ***]');
   result.push('');
   result.push(...contentLines.slice(-showAtEnd));
@@ -223,7 +236,7 @@ class StashServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.config = {
@@ -274,7 +287,10 @@ class StashServer {
           inputSchema: {
             type: 'object',
             properties: {
-              limit: { type: 'number', description: 'Number of projects to return (default: 25, max: 1000)' },
+              limit: {
+                type: 'number',
+                description: 'Number of projects to return (default: 25, max: 1000)',
+              },
               start: { type: 'number', description: 'Start index for pagination (default: 0)' },
             },
           },
@@ -291,7 +307,10 @@ class StashServer {
                 description:
                   'Bitbucket project key to list repositories from. If omitted, uses BITBUCKET_DEFAULT_PROJECT or lists all accessible repositories across projects.',
               },
-              limit: { type: 'number', description: 'Number of repositories to return (default: 25, max: 1000)' },
+              limit: {
+                type: 'number',
+                description: 'Number of repositories to return (default: 25, max: 1000)',
+              },
               start: { type: 'number', description: 'Start index for pagination (default: 0)' },
             },
           },
@@ -308,10 +327,22 @@ class StashServer {
                 description:
                   'Bitbucket project key. If omitted, uses BITBUCKET_DEFAULT_PROJECT environment variable. Use list_projects to discover available projects.',
               },
-              repository: { type: 'string', description: 'Repository slug where the pull request will be created.' },
-              title: { type: 'string', description: 'Clear, descriptive title for the pull request.' },
-              description: { type: 'string', description: 'Detailed description of changes (Markdown supported).' },
-              sourceBranch: { type: 'string', description: 'Source branch containing the changes.' },
+              repository: {
+                type: 'string',
+                description: 'Repository slug where the pull request will be created.',
+              },
+              title: {
+                type: 'string',
+                description: 'Clear, descriptive title for the pull request.',
+              },
+              description: {
+                type: 'string',
+                description: 'Detailed description of changes (Markdown supported).',
+              },
+              sourceBranch: {
+                type: 'string',
+                description: 'Source branch containing the changes.',
+              },
               targetBranch: { type: 'string', description: 'Target branch for merging.' },
               reviewers: {
                 type: 'array',
@@ -329,8 +360,14 @@ class StashServer {
           inputSchema: {
             type: 'object',
             properties: {
-              project: { type: 'string', description: 'Bitbucket project key (optional if default project configured).' },
-              repository: { type: 'string', description: 'Repository slug containing the pull request.' },
+              project: {
+                type: 'string',
+                description: 'Bitbucket project key (optional if default project configured).',
+              },
+              repository: {
+                type: 'string',
+                description: 'Repository slug containing the pull request.',
+              },
               prId: { type: 'number', description: 'Pull request ID.' },
             },
             required: ['repository', 'prId'],
@@ -342,8 +379,14 @@ class StashServer {
           inputSchema: {
             type: 'object',
             properties: {
-              project: { type: 'string', description: 'Bitbucket project key (optional if default project configured).' },
-              repository: { type: 'string', description: 'Repository slug containing the pull request.' },
+              project: {
+                type: 'string',
+                description: 'Bitbucket project key (optional if default project configured).',
+              },
+              repository: {
+                type: 'string',
+                description: 'Repository slug containing the pull request.',
+              },
               prId: { type: 'number', description: 'Pull request ID to merge.' },
               message: { type: 'string', description: 'Custom merge commit message.' },
               strategy: {
@@ -361,8 +404,14 @@ class StashServer {
           inputSchema: {
             type: 'object',
             properties: {
-              project: { type: 'string', description: 'Bitbucket project key (optional if default project configured).' },
-              repository: { type: 'string', description: 'Repository slug containing the pull request.' },
+              project: {
+                type: 'string',
+                description: 'Bitbucket project key (optional if default project configured).',
+              },
+              repository: {
+                type: 'string',
+                description: 'Repository slug containing the pull request.',
+              },
               prId: { type: 'number', description: 'Pull request ID to decline.' },
               message: { type: 'string', description: 'Reason for declining the pull request.' },
             },
@@ -375,8 +424,14 @@ class StashServer {
           inputSchema: {
             type: 'object',
             properties: {
-              project: { type: 'string', description: 'Bitbucket project key (optional if default project configured).' },
-              repository: { type: 'string', description: 'Repository slug containing the pull request.' },
+              project: {
+                type: 'string',
+                description: 'Bitbucket project key (optional if default project configured).',
+              },
+              repository: {
+                type: 'string',
+                description: 'Repository slug containing the pull request.',
+              },
               prId: { type: 'number', description: 'Pull request ID to comment on.' },
               text: { type: 'string', description: 'Comment text (Markdown supported).' },
               parentId: { type: 'number', description: 'Parent comment ID for threaded replies.' },
@@ -390,28 +445,51 @@ class StashServer {
           inputSchema: {
             type: 'object',
             properties: {
-              project: { type: 'string', description: 'Bitbucket project key (optional if default project configured).' },
-              repository: { type: 'string', description: 'Repository slug containing the pull request.' },
+              project: {
+                type: 'string',
+                description: 'Bitbucket project key (optional if default project configured).',
+              },
+              repository: {
+                type: 'string',
+                description: 'Repository slug containing the pull request.',
+              },
               prId: { type: 'number', description: 'Pull request ID to comment on.' },
               text: { type: 'string', description: 'Comment text (Markdown supported).' },
               parentId: { type: 'number', description: 'Parent comment ID for threaded replies.' },
               filePath: { type: 'string', description: 'Path to the file in the repository.' },
-              line: { type: 'number', description: 'Line number (1-based) to attach the comment to.' },
-              lineType: { type: 'string', enum: ['ADDED', 'REMOVED'], description: 'Line type (ADDED or REMOVED).' },
+              line: {
+                type: 'number',
+                description: 'Line number (1-based) to attach the comment to.',
+              },
+              lineType: {
+                type: 'string',
+                enum: ['ADDED', 'REMOVED'],
+                description: 'Line type (ADDED or REMOVED).',
+              },
             },
             required: ['repository', 'prId', 'text', 'filePath', 'line', 'lineType'],
           },
         },
         {
           name: 'get_diff',
-          description: 'Retrieve the diff for a pull request with optional truncation for large files.',
+          description:
+            'Retrieve the diff for a pull request with optional truncation for large files.',
           inputSchema: {
             type: 'object',
             properties: {
-              project: { type: 'string', description: 'Bitbucket project key (optional if default project configured).' },
-              repository: { type: 'string', description: 'Repository slug containing the pull request.' },
+              project: {
+                type: 'string',
+                description: 'Bitbucket project key (optional if default project configured).',
+              },
+              repository: {
+                type: 'string',
+                description: 'Repository slug containing the pull request.',
+              },
               prId: { type: 'number', description: 'Pull request ID to get diff for.' },
-              contextLines: { type: 'number', description: 'Context lines around changes (default: 10).' },
+              contextLines: {
+                type: 'number',
+                description: 'Context lines around changes (default: 10).',
+              },
               maxLinesPerFile: {
                 type: 'number',
                 description:
@@ -427,8 +505,14 @@ class StashServer {
           inputSchema: {
             type: 'object',
             properties: {
-              project: { type: 'string', description: 'Bitbucket project key (optional if default project configured).' },
-              repository: { type: 'string', description: 'Repository slug containing the pull request.' },
+              project: {
+                type: 'string',
+                description: 'Bitbucket project key (optional if default project configured).',
+              },
+              repository: {
+                type: 'string',
+                description: 'Repository slug containing the pull request.',
+              },
               prId: { type: 'number', description: 'Pull request ID to get reviews for.' },
             },
             required: ['repository', 'prId'],
@@ -436,12 +520,19 @@ class StashServer {
         },
         {
           name: 'get_activities',
-          description: 'Retrieve activity timeline for a pull request including comments and reviews.',
+          description:
+            'Retrieve activity timeline for a pull request including comments and reviews.',
           inputSchema: {
             type: 'object',
             properties: {
-              project: { type: 'string', description: 'Bitbucket project key (optional if default project configured).' },
-              repository: { type: 'string', description: 'Repository slug containing the pull request.' },
+              project: {
+                type: 'string',
+                description: 'Bitbucket project key (optional if default project configured).',
+              },
+              repository: {
+                type: 'string',
+                description: 'Repository slug containing the pull request.',
+              },
               prId: { type: 'number', description: 'Pull request ID to get activities for.' },
             },
             required: ['repository', 'prId'],
@@ -453,8 +544,14 @@ class StashServer {
           inputSchema: {
             type: 'object',
             properties: {
-              project: { type: 'string', description: 'Bitbucket project key (optional if default project configured).' },
-              repository: { type: 'string', description: 'Repository slug containing the pull request.' },
+              project: {
+                type: 'string',
+                description: 'Bitbucket project key (optional if default project configured).',
+              },
+              repository: {
+                type: 'string',
+                description: 'Repository slug containing the pull request.',
+              },
               prId: { type: 'number', description: 'Pull request ID to get comments for.' },
             },
             required: ['repository', 'prId'],
@@ -462,14 +559,19 @@ class StashServer {
         },
         {
           name: 'search',
-          description: 'Search for code or files across repositories using the Bitbucket search API.',
+          description:
+            'Search for code or files across repositories using the Bitbucket search API.',
           inputSchema: {
             type: 'object',
             properties: {
               query: { type: 'string', description: 'Search query string.' },
               project: { type: 'string', description: 'Project key to limit search scope.' },
               repository: { type: 'string', description: 'Repository slug to limit search scope.' },
-              type: { type: 'string', enum: ['code', 'file'], description: 'Search mode optimization.' },
+              type: {
+                type: 'string',
+                enum: ['code', 'file'],
+                description: 'Search mode optimization.',
+              },
               limit: { type: 'number', description: 'Results to return (default: 25, max: 100).' },
               start: { type: 'number', description: 'Start index for pagination (default: 0).' },
             },
@@ -482,11 +584,17 @@ class StashServer {
           inputSchema: {
             type: 'object',
             properties: {
-              project: { type: 'string', description: 'Bitbucket project key (optional if default project configured).' },
+              project: {
+                type: 'string',
+                description: 'Bitbucket project key (optional if default project configured).',
+              },
               repository: { type: 'string', description: 'Repository slug containing the file.' },
               filePath: { type: 'string', description: 'Path to the file in the repository.' },
               branch: { type: 'string', description: 'Branch or commit hash (optional).' },
-              limit: { type: 'number', description: 'Lines per request (default: 100, max: 1000).' },
+              limit: {
+                type: 'number',
+                description: 'Lines per request (default: 100, max: 1000).',
+              },
               start: { type: 'number', description: 'Starting line number (0-based, default: 0).' },
             },
             required: ['repository', 'filePath'],
@@ -498,11 +606,77 @@ class StashServer {
           inputSchema: {
             type: 'object',
             properties: {
-              project: { type: 'string', description: 'Bitbucket project key (optional if default project configured).' },
+              project: {
+                type: 'string',
+                description: 'Bitbucket project key (optional if default project configured).',
+              },
               repository: { type: 'string', description: 'Repository slug containing the path.' },
               path: { type: 'string', description: 'Directory path to browse (default: root).' },
               branch: { type: 'string', description: 'Branch or commit hash (optional).' },
               limit: { type: 'number', description: 'Maximum items to return (default: 50).' },
+            },
+            required: ['repository'],
+          },
+        },
+        {
+          name: 'create_repository',
+          description:
+            'Create a new repository in a Bitbucket project. Use list_projects first to find the project key.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              project: {
+                type: 'string',
+                description:
+                  'Bitbucket project key (e.g., ~username for personal projects). If omitted, uses BITBUCKET_DEFAULT_PROJECT.',
+              },
+              name: { type: 'string', description: 'Repository name.' },
+              description: { type: 'string', description: 'Repository description.' },
+              forkable: {
+                type: 'boolean',
+                description: 'Whether the repository is forkable (default: true).',
+              },
+              defaultBranch: {
+                type: 'string',
+                description: 'Default branch name (default: main).',
+              },
+            },
+            required: ['name'],
+          },
+        },
+        {
+          name: 'delete_repository',
+          description: 'Delete a repository from a Bitbucket project. This action is irreversible.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              project: {
+                type: 'string',
+                description: 'Bitbucket project key (optional if default project configured).',
+              },
+              repository: { type: 'string', description: 'Repository slug to delete.' },
+            },
+            required: ['repository'],
+          },
+        },
+        {
+          name: 'list_branches',
+          description:
+            'List branches in a repository. Returns branch names, latest commit info, and whether the branch is the default.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              project: {
+                type: 'string',
+                description: 'Bitbucket project key (optional if default project configured).',
+              },
+              repository: { type: 'string', description: 'Repository slug.' },
+              filterText: { type: 'string', description: 'Filter branches by name substring.' },
+              limit: {
+                type: 'number',
+                description: 'Number of branches to return (default: 25, max: 1000).',
+              },
+              start: { type: 'number', description: 'Start index for pagination (default: 0).' },
             },
             required: ['repository'],
           },
@@ -527,7 +701,7 @@ class StashServer {
                   message: 'Write operations are disabled via BITBUCKET_READ_ONLY=true',
                 },
                 null,
-                2
+                2,
               ),
             },
           ],
@@ -581,7 +755,7 @@ class StashServer {
               {
                 message: args.message as string,
                 strategy: args.strategy as MergeOptions['strategy'],
-              }
+              },
             );
 
           case 'decline_pull_request':
@@ -591,7 +765,7 @@ class StashServer {
                 repository: args.repository as string,
                 prId: args.prId as number,
               },
-              args.message as string
+              args.message as string,
             );
 
           case 'add_comment':
@@ -604,7 +778,7 @@ class StashServer {
               {
                 text: args.text as string,
                 parentId: args.parentId as number,
-              }
+              },
             );
 
           case 'add_comment_inline':
@@ -620,7 +794,7 @@ class StashServer {
                 filePath: args.filePath as string,
                 line: args.line as number,
                 lineType: args.lineType as InlineCommentOptions['lineType'],
-              }
+              },
             );
 
           case 'get_diff':
@@ -631,7 +805,7 @@ class StashServer {
                 prId: args.prId as number,
               },
               args.contextLines as number,
-              args.maxLinesPerFile as number
+              args.maxLinesPerFile as number,
             );
 
           case 'get_reviews':
@@ -684,6 +858,30 @@ class StashServer {
               limit: args.limit as number,
             });
 
+          case 'create_repository':
+            return await this.createRepository({
+              project: projectKey,
+              name: args.name as string,
+              description: args.description as string,
+              forkable: args.forkable as boolean,
+              defaultBranch: args.defaultBranch as string,
+            });
+
+          case 'delete_repository':
+            return await this.deleteRepository({
+              project: projectKey,
+              repository: args.repository as string,
+            });
+
+          case 'list_branches':
+            return await this.listBranches({
+              project: projectKey,
+              repository: args.repository as string,
+              filterText: args.filterText as string,
+              limit: args.limit as number,
+              start: args.start as number,
+            });
+
           default:
             throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${request.params.name}`);
         }
@@ -692,7 +890,7 @@ class StashServer {
         if (axios.isAxiosError(error)) {
           throw new McpError(
             ErrorCode.InternalError,
-            `Bitbucket API error: ${error.response?.data?.message ?? error.message}`
+            `Bitbucket API error: ${error.response?.data?.message ?? error.message}`,
           );
         }
         throw error;
@@ -700,9 +898,16 @@ class StashServer {
     });
   }
 
-  private requireProject(project?: string, repository?: string, prId?: number): asserts project is string {
+  private requireProject(
+    project?: string,
+    repository?: string,
+    prId?: number,
+  ): asserts project is string {
     if (!project) {
-      throw new McpError(ErrorCode.InvalidParams, 'Project is required (set BITBUCKET_DEFAULT_PROJECT or pass project).');
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        'Project is required (set BITBUCKET_DEFAULT_PROJECT or pass project).',
+      );
     }
     if (repository === '') {
       throw new McpError(ErrorCode.InvalidParams, 'Repository is required.');
@@ -721,13 +926,21 @@ class StashServer {
     const summary = {
       total: response.data.size || projects.length,
       showing: projects.length,
-      projects: projects.map((project: { key: string; name: string; description?: string; public: boolean; type: string }) => ({
-        key: project.key,
-        name: project.name,
-        description: project.description,
-        public: project.public,
-        type: project.type,
-      })),
+      projects: projects.map(
+        (project: {
+          key: string;
+          name: string;
+          description?: string;
+          public: boolean;
+          type: string;
+        }) => ({
+          key: project.key,
+          name: project.name,
+          description: project.description,
+          public: project.public,
+          type: project.type,
+        }),
+      ),
     };
 
     return { content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }] };
@@ -766,9 +979,11 @@ class StashServer {
           description: repo.description,
           project: repo.project?.key,
           public: repo.public,
-          cloneUrl: repo.links?.clone?.find((link: { name: string; href: string }) => link.name === 'http')?.href,
+          cloneUrl: repo.links?.clone?.find(
+            (link: { name: string; href: string }) => link.name === 'http',
+          )?.href,
           state: repo.state,
-        })
+        }),
       ),
     };
 
@@ -782,25 +997,28 @@ class StashServer {
     }
 
     const api = this.getApi();
-    const response = await api.post(`/projects/${input.project}/repos/${input.repository}/pull-requests`, {
-      title: input.title,
-      description: input.description ?? '',
-      fromRef: {
-        id: `refs/heads/${input.sourceBranch}`,
-        repository: {
-          slug: input.repository,
-          project: { key: input.project },
+    const response = await api.post(
+      `/projects/${input.project}/repos/${input.repository}/pull-requests`,
+      {
+        title: input.title,
+        description: input.description ?? '',
+        fromRef: {
+          id: `refs/heads/${input.sourceBranch}`,
+          repository: {
+            slug: input.repository,
+            project: { key: input.project },
+          },
         },
-      },
-      toRef: {
-        id: `refs/heads/${input.targetBranch}`,
-        repository: {
-          slug: input.repository,
-          project: { key: input.project },
+        toRef: {
+          id: `refs/heads/${input.targetBranch}`,
+          repository: {
+            slug: input.repository,
+            project: { key: input.project },
+          },
         },
+        reviewers: input.reviewers?.map((username) => ({ user: { name: username } })),
       },
-      reviewers: input.reviewers?.map((username) => ({ user: { name: username } })),
-    });
+    );
 
     return { content: [{ type: 'text', text: JSON.stringify(response.data, null, 2) }] };
   }
@@ -812,7 +1030,9 @@ class StashServer {
     }
 
     const api = this.getApi();
-    const response = await api.get(`/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}`);
+    const response = await api.get(
+      `/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}`,
+    );
     return { content: [{ type: 'text', text: JSON.stringify(response.data, null, 2) }] };
   }
 
@@ -823,11 +1043,14 @@ class StashServer {
     }
 
     const api = this.getApi();
-    const response = await api.post(`/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/merge`, {
-      version: -1,
-      message: options.message,
-      strategy: options.strategy || 'merge-commit',
-    });
+    const response = await api.post(
+      `/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/merge`,
+      {
+        version: -1,
+        message: options.message,
+        strategy: options.strategy || 'merge-commit',
+      },
+    );
 
     return { content: [{ type: 'text', text: JSON.stringify(response.data, null, 2) }] };
   }
@@ -839,10 +1062,13 @@ class StashServer {
     }
 
     const api = this.getApi();
-    const response = await api.post(`/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/decline`, {
-      version: -1,
-      message,
-    });
+    const response = await api.post(
+      `/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/decline`,
+      {
+        version: -1,
+        message,
+      },
+    );
 
     return { content: [{ type: 'text', text: JSON.stringify(response.data, null, 2) }] };
   }
@@ -854,35 +1080,47 @@ class StashServer {
     }
 
     const api = this.getApi();
-    const response = await api.post(`/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/comments`, {
-      text: options.text,
-      parent: options.parentId ? { id: options.parentId } : undefined,
-    });
+    const response = await api.post(
+      `/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/comments`,
+      {
+        text: options.text,
+        parent: options.parentId ? { id: options.parentId } : undefined,
+      },
+    );
 
     return { content: [{ type: 'text', text: JSON.stringify(response.data, null, 2) }] };
   }
 
   private async addCommentInline(params: PullRequestParams, options: InlineCommentOptions) {
     this.requireProject(params.project, params.repository, params.prId);
-    if (!params.repository || !params.prId || !options.filePath || !options.line || !options.lineType) {
+    if (
+      !params.repository ||
+      !params.prId ||
+      !options.filePath ||
+      !options.line ||
+      !options.lineType
+    ) {
       throw new McpError(
         ErrorCode.InvalidParams,
-        'Repository, prId, filePath, line, and lineType are required'
+        'Repository, prId, filePath, line, and lineType are required',
       );
     }
 
     const api = this.getApi();
-    const response = await api.post(`/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/comments`, {
-      text: options.text,
-      parent: options.parentId ? { id: options.parentId } : undefined,
-      anchor: {
-        path: options.filePath,
-        lineType: options.lineType,
-        line: options.line,
-        diffType: 'EFFECTIVE',
-        fileType: 'TO',
+    const response = await api.post(
+      `/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/comments`,
+      {
+        text: options.text,
+        parent: options.parentId ? { id: options.parentId } : undefined,
+        anchor: {
+          path: options.filePath,
+          lineType: options.lineType,
+          line: options.line,
+          diffType: 'EFFECTIVE',
+          fileType: 'TO',
+        },
       },
-    });
+    );
 
     return { content: [{ type: 'text', text: JSON.stringify(response.data, null, 2) }] };
   }
@@ -894,13 +1132,19 @@ class StashServer {
     }
 
     const api = this.getApi();
-    const response = await api.get(`/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/diff`, {
-      params: { contextLines },
-      headers: { Accept: 'text/plain' },
-    });
+    const response = await api.get(
+      `/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/diff`,
+      {
+        params: { contextLines },
+        headers: { Accept: 'text/plain' },
+      },
+    );
 
-    const effectiveMaxLines = maxLinesPerFile !== undefined ? maxLinesPerFile : this.config.maxLinesPerFile;
-    const diffContent = effectiveMaxLines ? truncateDiff(response.data, effectiveMaxLines) : response.data;
+    const effectiveMaxLines =
+      maxLinesPerFile !== undefined ? maxLinesPerFile : this.config.maxLinesPerFile;
+    const diffContent = effectiveMaxLines
+      ? truncateDiff(response.data, effectiveMaxLines)
+      : response.data;
 
     return { content: [{ type: 'text', text: diffContent }] };
   }
@@ -912,10 +1156,13 @@ class StashServer {
     }
 
     const api = this.getApi();
-    const response = await api.get(`/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/activities`);
+    const response = await api.get(
+      `/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/activities`,
+    );
 
     const reviews = response.data.values.filter(
-      (activity: BitbucketActivity) => activity.action === 'APPROVED' || activity.action === 'REVIEWED'
+      (activity: BitbucketActivity) =>
+        activity.action === 'APPROVED' || activity.action === 'REVIEWED',
     );
 
     return { content: [{ type: 'text', text: JSON.stringify(reviews, null, 2) }] };
@@ -928,7 +1175,9 @@ class StashServer {
     }
 
     const api = this.getApi();
-    const response = await api.get(`/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/activities`);
+    const response = await api.get(
+      `/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/activities`,
+    );
 
     return { content: [{ type: 'text', text: JSON.stringify(response.data, null, 2) }] };
   }
@@ -940,9 +1189,13 @@ class StashServer {
     }
 
     const api = this.getApi();
-    const response = await api.get(`/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/activities`);
+    const response = await api.get(
+      `/projects/${params.project}/repos/${params.repository}/pull-requests/${params.prId}/activities`,
+    );
 
-    const comments = response.data.values.filter((activity: BitbucketActivity) => activity.action === 'COMMENTED');
+    const comments = response.data.values.filter(
+      (activity: BitbucketActivity) => activity.action === 'COMMENTED',
+    );
 
     return { content: [{ type: 'text', text: JSON.stringify(comments, null, 2) }] };
   }
@@ -1019,12 +1272,18 @@ class StashServer {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 404) {
-          throw new McpError(ErrorCode.InternalError, 'Search API endpoint not available on this Bitbucket instance');
+          throw new McpError(
+            ErrorCode.InternalError,
+            'Search API endpoint not available on this Bitbucket instance',
+          );
         }
         const errorData = error.response?.data as { errors?: { message?: string }[] } | undefined;
         if (errorData?.errors?.length) {
           const firstError = errorData.errors[0];
-          throw new McpError(ErrorCode.InvalidParams, `Search error: ${firstError.message || 'Invalid search query'}`);
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            `Search error: ${firstError.message || 'Invalid search query'}`,
+          );
         }
       }
       throw error;
@@ -1048,7 +1307,9 @@ class StashServer {
       params.at = branch;
     }
 
-    const response = await api.get(`/projects/${project}/repos/${repository}/browse/${filePath}`, { params });
+    const response = await api.get(`/projects/${project}/repos/${repository}/browse/${filePath}`, {
+      params,
+    });
     const fileContent = {
       project,
       repository,
@@ -1064,7 +1325,13 @@ class StashServer {
     return { content: [{ type: 'text', text: JSON.stringify(fileContent, null, 2) }] };
   }
 
-  private async browseRepository(options: { project?: string; repository?: string; path?: string; branch?: string; limit?: number }) {
+  private async browseRepository(options: {
+    project?: string;
+    repository?: string;
+    path?: string;
+    branch?: string;
+    limit?: number;
+  }) {
     this.requireProject(options.project, options.repository);
     if (!options.repository) {
       throw new McpError(ErrorCode.InvalidParams, 'Repository is required');
@@ -1079,7 +1346,9 @@ class StashServer {
     }
 
     const browsePath = path ? `/${path}` : '';
-    const response = await api.get(`/projects/${project}/repos/${repository}/browse${browsePath}`, { params });
+    const response = await api.get(`/projects/${project}/repos/${repository}/browse${browsePath}`, {
+      params,
+    });
 
     const children = response.data.children || {};
     const browseResults = {
@@ -1091,15 +1360,120 @@ class StashServer {
       size: children.size || 0,
       showing: children.values?.length || 0,
       items:
-        children.values?.map((item: { path: { name: string; toString: string }; type: string; size?: number }) => ({
-          name: item.path.name,
-          path: item.path.toString,
-          type: item.type,
-          size: item.size,
-        })) || [],
+        children.values?.map(
+          (item: { path: { name: string; toString: string }; type: string; size?: number }) => ({
+            name: item.path.name,
+            path: item.path.toString,
+            type: item.type,
+            size: item.size,
+          }),
+        ) || [],
     };
 
     return { content: [{ type: 'text', text: JSON.stringify(browseResults, null, 2) }] };
+  }
+
+  private async createRepository(input: CreateRepositoryInput) {
+    const project = resolveProject(input.project, this.config.defaultProject);
+    if (!project) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        'Project is required (set BITBUCKET_DEFAULT_PROJECT or pass project).',
+      );
+    }
+    if (!input.name) {
+      throw new McpError(ErrorCode.InvalidParams, 'Repository name is required');
+    }
+
+    const api = this.getApi();
+    const body: Record<string, unknown> = {
+      name: input.name,
+      scmId: 'git',
+    };
+    if (input.description) body.description = input.description;
+    if (input.forkable !== undefined) body.forkable = input.forkable;
+    if (input.defaultBranch) body.defaultBranch = input.defaultBranch;
+
+    const response = await api.post(`/projects/${project}/repos`, body);
+
+    const repo = response.data;
+    const summary = {
+      slug: repo.slug,
+      name: repo.name,
+      description: repo.description,
+      project: repo.project?.key,
+      cloneUrl: repo.links?.clone?.find(
+        (link: { name: string; href: string }) => link.name === 'http',
+      )?.href,
+      sshCloneUrl: repo.links?.clone?.find(
+        (link: { name: string; href: string }) => link.name === 'ssh',
+      )?.href,
+      state: repo.state,
+    };
+
+    return { content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }] };
+  }
+
+  private async deleteRepository(params: RepositoryParams) {
+    this.requireProject(params.project, params.repository);
+    if (!params.repository) {
+      throw new McpError(ErrorCode.InvalidParams, 'Repository is required');
+    }
+
+    const api = this.getApi();
+    await api.delete(`/projects/${params.project}/repos/${params.repository}`);
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(
+            { deleted: true, repository: params.repository, project: params.project },
+            null,
+            2,
+          ),
+        },
+      ],
+    };
+  }
+
+  private async listBranches(options: {
+    project?: string;
+    repository?: string;
+    filterText?: string;
+    limit?: number;
+    start?: number;
+  }) {
+    this.requireProject(options.project, options.repository);
+    if (!options.repository) {
+      throw new McpError(ErrorCode.InvalidParams, 'Repository is required');
+    }
+
+    const api = this.getApi();
+    const { project, repository, filterText, limit = 25, start = 0 } = options;
+    const params: Record<string, string | number> = { limit: Math.min(limit, 1000), start };
+    if (filterText) params.filterText = filterText;
+
+    const response = await api.get(`/projects/${project}/repos/${repository}/branches`, { params });
+
+    const branches = response.data.values || [];
+    const summary = {
+      project,
+      repository,
+      total: response.data.size || branches.length,
+      showing: branches.length,
+      isLastPage: response.data.isLastPage,
+      branches: branches.map(
+        (branch: { displayId: string; id: string; isDefault: boolean; latestCommit: string }) => ({
+          name: branch.displayId,
+          id: branch.id,
+          isDefault: branch.isDefault,
+          latestCommit: branch.latestCommit,
+        }),
+      ),
+    };
+
+    return { content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }] };
   }
 
   async run() {

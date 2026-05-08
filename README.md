@@ -61,6 +61,23 @@ Add to `~/.claude/user-mcps.json`:
 - `BITBUCKET_DIFF_MAX_LINES_PER_FILE`: Diff truncation limit per file.
 - `BITBUCKET_READ_ONLY`: Set to `true` to disable write operations.
 
+## Dependencies
+
+- **[Hermes](https://github.com/schwarztim/hermes)** — Authentication broker. Manages OAuth2/SSO token acquisition, refresh, and serving for this MCP server.
+- **[ToolHive](https://github.com/stacklok/toolhive)** — Container runtime. Hosts this server as a Docker container with streamable HTTP transport.
+- **[MCP Gateway](http://127.0.0.1:3100/mcp)** — Aggregation layer. Provides unified tool access across all MCP backends.
+- **[node-vault-mcp](~/Projects/node-vault-mcp)** — Credential storage. AES-256-GCM encrypted file vault (replaces macOS Keychain/keytar).
+
+## Architecture
+
+This MCP server runs as a Docker container managed by ToolHive:
+
+1. **Container** — Built from the local Dockerfile and published as `localhost:5555/stash-mcp:latest`
+2. **Transport** — Streamable HTTP via the ToolHive proxy
+3. **Authentication** — Managed by Hermes (`http://127.0.0.1:9876`)
+4. **Discovery** — Exposed through MCP Gateway at `http://127.0.0.1:3100/mcp`
+5. **Credentials** — Stored in `~/.claude/secrets.vault` via node-vault-mcp (AES-256-GCM)
+
 ## Usage
 
 ### List projects
