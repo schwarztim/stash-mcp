@@ -20,7 +20,7 @@
     "inspector": "npx @modelcontextprotocol/inspector dist/index.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.1.1",
+    "@modelcontextprotocol/sdk": "^1.26.0",
     "axios": "^1.18.0",
     "winston": "^3.11.0"
   },
